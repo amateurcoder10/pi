@@ -1,3 +1,1 @@
-find -name '*.jpg' | # find jpegs
-gawk 'BEGIN{ a=1 }{ printf "mv %s %04d.jpg\n", $0, a++ }' | # build mv command
-bash
+ls | cat -n | while read n f; do mv "$f" "file-$n.jpg"; done

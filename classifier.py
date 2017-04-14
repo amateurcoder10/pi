@@ -12,6 +12,12 @@ from scipy.cluster.vq import *
 # Importing the library which classifies set of observations into clusters
 from imutils import paths
 # Load the classifier, class names, scaler, number of clusters and vocabulary 
+class patternlessException(Exception):
+ 
+    # Constructor or Initializer
+    def __init__(self):
+     	pass
+
 samples = np.loadtxt('samples.data',np.float32)
 print(samples.shape)
 
@@ -59,7 +65,7 @@ else:
 #print(image_paths)
     
 # Create feature extraction and keypoint detector objects
-SIFT=cv2.xfeatures2d.SIFT_create()
+SURF=cv2.xfeatures2d.SURF_create()
 l=0
 # List where all the descriptors are stored
 des_list = []
@@ -70,10 +76,25 @@ for image_path in image_paths:
         exit()
     #l=l+1
     #print(l)
-    kpts, des =SIFT.detectAndCompute(im, None)  # Computing the descriptors of the test image
+    kpts, des =SURF.detectAndCompute(im, None)  # Computing the descriptors of the test image
+    if(args["image"]):
+	if(des==None):
+		flag=1
+		try:
+			raise patternlessException
+		except patternlessException as error:
+			image = cv2.imread(image_path)
+			cv2.namedWindow("Image",cv2.WINDOW_AUTOSIZE)  # Creating a named window
+			pt = (1,image.shape[0]//6)  # Framing the size of font on the image
+			cv2.putText(image, "patternless", pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,2, [0, 0, 255],2)  # Placing text on the image
+			cv2.imshow("Image",image)  # Displaying the image
+			cv2.waitKey()  # Wait for the keystroke of the user
+			exit()    
     des_list.append((image_path, des))   # Appending the descriptors to a single list
+
 print(len(des_list))
-    
+
+
 # Stack all the descriptors vertically in a numpy array
 descriptors = des_list[0][1]
 for image_path, descriptor in des_list[1:]:
@@ -105,18 +126,19 @@ if args["visualize"]:
 	    for image_path in image_paths:
 		   
 
-
-		    if results[l][0] == 0:  # results[0][0] will have the predicted class
-	    		prediction = "Horse"
-		    else:
-		        prediction = "Bike"
-		    l=l+1
-	    	    image = cv2.imread(image_path)
-		    cv2.namedWindow("Image",cv2.WINDOW_AUTOSIZE)  # Creating a named window
-		    pt = (180,3*image.shape[0]//4)  # Framing the size of font on the image
-		    cv2.putText(image, prediction, pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,2, [0, 0, 255],2)  # Placing text on the image
-		    cv2.imshow("Image",image)  # Displaying the image
-		    cv2.waitKey()  # Wait for the keystroke of the user
+ 		if results[l][0] == 0:  # results[0][0] will have the predicted class
+	    		prediction = "plaid"
+	    	elif results[l][0]==1:
+			prediction = "striped"
+	    	else:
+			prediction="irregular"
+		l=l+1
+	    	image = cv2.imread(image_path)
+		cv2.namedWindow("Image",cv2.WINDOW_AUTOSIZE)  # Creating a named window
+		pt = (1,image.shape[0]//6)  # Framing the size of font on the image
+		cv2.putText(image, prediction, pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,2, [0, 0, 255],2)  # Placing text on the image
+		cv2.imshow("Image",image)  # Displaying the image
+		cv2.waitKey()  # Wait for the keystroke of the user
 	else:
             if results[0][0] == 0:  # results[0][0] will have the predicted class
 	    	prediction = "plaid"

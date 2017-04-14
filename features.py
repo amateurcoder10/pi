@@ -15,6 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from imutils import paths
 import sys
 sys.path.append('/home/pra/.virtualenvs/cv/lib/python2.7/site-packages/')
+import matplotlib.pyplot as plt
 
 # Get the path of the training set
 parser = ap.ArgumentParser()
@@ -37,13 +38,13 @@ for training_name in training_names:  # Iterate over the training_names list
     image_paths+=class_path
     image_classes+=[class_id]*len(class_path)
     class_id+=1
-SIFT=cv2.xfeatures2d.SIFT_create()
+SURF=cv2.xfeatures2d.SURF_create()
 
 # Create feature extraction and keypoint detector objects
 # List where all the descriptors are stored
 des_list = []
 print(len(image_paths))
-#l=0
+i=0
 #print(image_paths)
 # Reading the image and calculating the features and corresponding descriptors
 for image_path in image_paths:
@@ -53,24 +54,24 @@ for image_path in image_paths:
     #cv2.imshow('im',im)
     
     im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-    kpts, des =SIFT.detectAndCompute(im, None)  # Computing the key points and the descriptors
+    kpts, des =SURF.detectAndCompute(im, None)  # Computing the key points and the descriptors
+    #plt.imshow(cv2.drawKeypoints(im, kpts,im.copy()))
     #print(des.shape)
-    
-    print(image_path,des)
+    if(des==None):
+	i+=1
+        print(image_path,des)
+	continue
+   
     des_list.append((image_path, des))  # Appending all the descriptors into the single list
-
-print(len(des_list[0][1]))
+print(i)
+print(len(des_list))
 # Stack all the descriptors vertically in a numpy array
 descriptors = des_list[0][1]
 print(descriptors.shape)
 i=0
 for image_path, descriptor in des_list[1:]:
-    i+=1
-    print(i)
-    print(image_path)
-    print(descriptors.shape)
-    print(descriptor.shape)
-    descriptors = np.vstack((descriptors, descriptor))  # Stacking the descriptors
+   descriptors = np.vstack((descriptors, descriptor))
+ 
 
 # Perform k-means clustering
 k = 500  # Number of clusters
@@ -78,7 +79,7 @@ voc, variance = kmeans(descriptors, k, 1)  # Perform Kmeans with default values
 
 # Calculate the histogram of features
 im_features = np.zeros((len(image_paths), k), "float32")
-for i in xrange(len(image_paths)):
+for i in xrange(len(des_list)):
     words, distance = vq(des_list[i][1],voc)
     for w in words:
         im_features[i][w] += 1
