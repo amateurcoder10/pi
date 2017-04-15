@@ -28,18 +28,18 @@ NUM_CLUSTERS = 5
 # Convert image into array of values for each point.
 ar = scipy.misc.fromimage(image)
 shape = ar.shape
-print (shape)
+#print (shape)
 
 # Reshape array of values to merge color bands.
 if len(shape) > 2:
     ar = ar.reshape(scipy.product(shape[:2]), shape[2])
 
-print (ar.shape)
+#print (ar.shape)
 # Get NUM_CLUSTERS worth of centroids.
 
 codes,_= scipy.cluster.vq.kmeans(ar.astype(float), NUM_CLUSTERS)
 
-print(codes)
+#print(codes)
 
 # Pare centroids, removing blacks and whites and shades of really dark and really light.
 original_codes = codes
@@ -50,36 +50,36 @@ for low, hi in [(60, 200), (35, 230), (10, 250)]:
     if not len(codes): codes = original_codes
     else: break
 codes= codes.astype(int)
-print(codes)
+#print(codes)
 
 
 # Assign codes (vector quantization). Each vector is compared to the centroids
 # and assigned the nearest one.
 vecs, _ = scipy.cluster.vq.vq(ar, codes)#index of the code array closest in ar
-print(vecs)
+#print(vecs)
 
 # Count occurences of each clustered vector.
 counts, bins = scipy.histogram(vecs, len(codes))
 
-print(bins,counts)
+#print(bins,counts)
 codes1=codes/255
-print(codes1)
+#print(codes1)
 
 colors=[rgb2hex(code) for code in codes1]
-print(colors)
+#print(colors)
 
 total = scipy.sum(counts)
-print(total)
+#print(total)
 color_dist = dict(zip(colors, [count/float(total) for count in counts]))
 pprint(color_dist)
-print("counts are",counts)
-print("codes are",codes)
+#print("counts are",counts)
+#print("codes are",codes)
 # Find the most frequent color, based on the counts.
 index_max = scipy.argmax(counts)
-print("max index:",index_max)
+#print("max index:",index_max)
 
 peak = codes[index_max]
-print("Peak is ",peak)
+#print("Peak is ",peak)
 
 color = rgb2hex(peak/255)
 
@@ -94,7 +94,7 @@ for voice in voices:
 
 try:
 	c=webcolors.rgb_to_name(peak)
-	print(c)
+	print("dominant color is",c)
 	engine.say('The dominant color is ')
 	engine.say(c)
 	
@@ -102,6 +102,7 @@ try:
 except ValueError:
         closest_name = closest_colour(peak)
 	engine.say('The dominant color is ')
+	print("dominant color is",closest_name)
 	engine.say(closest_name)
 	
 
@@ -109,26 +110,27 @@ except ValueError:
 counts=numpy.delete(counts,index_max)
 codes=numpy.delete(codes,index_max,0)
 
-print("new counts is",counts)
-print("new codes is",codes)
+#print("new counts is",counts)
+#print("new codes is",codes)
 index_max = scipy.argmax(counts)
-print('2nd itermax is ',index_max)
+#print('2nd itermax is ',index_max)
 
 peak = codes[index_max]
-print(peak)
+#print(peak)
 
 color = rgb2hex(peak/255)
 
 try:
 	c=webcolors.rgb_to_name(peak)
-	print(c)
+	print("the auxillary color is",c)
 	engine.say('Auxillary color is ')
 	engine.say(c)
 	
 
 except ValueError:
         closest_name = closest_colour(peak)
-	engine.say('Auxillary color is ')
+	print("the auxillary color is",closest_name)
+	engine.say('Auxillary color is')
 	engine.say(closest_name)
 	
 engine.runAndWait()

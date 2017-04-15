@@ -86,8 +86,9 @@ for image_path in image_paths:
 			image = cv2.imread(image_path)
 			cv2.namedWindow("Image",cv2.WINDOW_AUTOSIZE)  # Creating a named window
 			pt = (1,image.shape[0]//6)  # Framing the size of font on the image
-			cv2.putText(image, "patternless", pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,2, [0, 0, 255],2)  # Placing text on the image
+			cv2.putText(image, "patternless", pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,1, [0, 0, 255],1)  # Placing text on the image
 			cv2.imshow("Image",image)  # Displaying the image
+			cv2.imwrite("res.jpg",image)
 			cv2.waitKey()  # Wait for the keystroke of the user
 			exit()    
     des_list.append((image_path, des))   # Appending the descriptors to a single list
@@ -150,7 +151,7 @@ if args["visualize"]:
 	    image = cv2.imread(image_path)
 	    cv2.namedWindow("Image",cv2.WINDOW_AUTOSIZE)  # Creating a named window
 	    pt = (1,image.shape[0]//4)  # Framing the size of font on the image
-	    cv2.putText(image, prediction, pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,2, [0, 0, 255],2)  # Placing text on the image
+	    cv2.putText(image, prediction, pt ,cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,1, [0, 0, 255],2)  # Placing text on the image
             cv2.imshow("Image",image)  # Displaying the image
 	    cv2.imwrite("res.jpg",image)
 	    cv2.waitKey()  # Wait for the keystroke of the user
