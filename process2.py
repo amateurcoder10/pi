@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import sys
+
 kernel = np.ones((3,3),np.uint8)
 if len(sys.argv) != 2:
     print ("%s input_file output_file" % (sys.argv[0]))
@@ -10,10 +11,18 @@ else:
     img = cv2.imread(sys.argv[1]) #Gray scale
     img2 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite('gray.jpeg',img2)
-    blur = cv2.GaussianBlur(img2,(5,5),0) #Guassian blurrring
+    blur = cv2.GaussianBlur(img2,(3,3),0) #Guassian blurrring
 
     #Otsu thresholding
-    ret3,th = cv2.threshold(blur,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU) 
+    ret3,th = cv2.threshold(img2,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU) 
+    white=cv2.countNonZero(th)
+    print(white)
+    black=th.shape[0]*th.shape[1]-white
+    print(black)
+
+    if(white > black):
+    	new=np.invert(th)#np.zeros(th.shape[0],th.shape[1])
+	th=new
     cv2.imwrite('Otsu.jpeg',th)
 
     #Dilation
